@@ -100,7 +100,7 @@ recover the original message.
 
 ## Building
 
-Built with C++ and the [Crypto++](https://www.cryptopp.com/) library via
+Built with C++ and the [Crypto++](https://cryptopp-modern.com) library via
 vcpkg. See `CMakeLists.txt` for the exact dependency setup.
 
 ## Security Notes
