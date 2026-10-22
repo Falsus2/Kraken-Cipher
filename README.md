@@ -19,7 +19,7 @@ XORs again, since `(P ⊕ K) ⊕ K = P`.
 
 ### Key and nonce
 
-- **Private key:** 128 bits, supplied as a 32-character hex string, known
+- **Private key:** 256 bits, supplied as a 64-character hex string, known
   only to the sender and receiver.
 - **Nonce:** 64 bits, generated fresh and randomly for every message using a
   cryptographically secure random number generator (CryptoPP's
@@ -39,8 +39,8 @@ through three hash stages:
 
 ```
 block input  = nonce (8 bytes) + counter (4 bytes)
-round 1      = HMAC-Whirlpool(key, block input)
-round 2      = SHAKE128(round 1)
+round 1      = BLAKE3-MAC(key, block input)
+round 2      = Whirlpool(round 1)
 block output = SHA3-512(round 2)
 ```
 
@@ -51,7 +51,7 @@ block output = SHA3-512(round 2)
   previous block's output. This means blocks can, in principle, be computed
   in any order or in parallel, which is the defining property of CTR mode.
 - **Three-stage hashing:** running the input through three different hash
-  constructions (HMAC-Whirlpool, then SHAKE128, then SHA3-512) rather than a
+  constructions (BLAKE3-MAC, then Whirlpool, then SHA3-512) rather than a
   single hash is intended to make the relationship between the input and the
   final output harder to analyze than any one algorithm alone.
 
@@ -84,8 +84,8 @@ plaintext.
 ## Usage
 
 ```
-Input your private key (128 bit hex):
-<32 hex characters>
+Input your private key (256 bit hex):
+<64 hex characters>
 
 Would you like to encrypt or decrypt? (E or D)
 E
@@ -100,8 +100,7 @@ recover the original message.
 
 ## Building
 
-Built with C++ and the [Crypto++](https://cryptopp-modern.com) library via
-vcpkg. See `CMakeLists.txt` for the exact dependency setup.
+Built with C++ and the [cryptopp-modern](https://cryptopp-modern.com) library. See `CMakeLists.txt` for the exact dependency setup.
 
 ## Security Notes
 
@@ -118,7 +117,7 @@ A few things worth knowing if you're evaluating this project:
   production system would pair this with a MAC (e.g. HMAC over the
   ciphertext) to detect modification.
 - **Composing multiple hash functions doesn't automatically add security.**
-  Stacking HMAC-Whirlpool, SHAKE128, and SHA3-512 is an interesting design
+  Stacking BLAKE3-MAC, Whirlpool, and SHA3-512 is an interesting design
   experiment, but whether this specific composition is actually stronger
   than any one of them alone is an open question this project doesn't
   answer.
