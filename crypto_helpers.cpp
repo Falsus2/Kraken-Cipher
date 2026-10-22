@@ -1,13 +1,10 @@
 #include <cryptopp/osrng.h>
 #include <cryptopp/hex.h>
-#include <cryptopp/hmac.h>
+#include <cryptopp/blake3.h>
 #include <cryptopp/whrlpool.h>
-#include <cryptopp/shake.h>
 #include <cryptopp/sha3.h>
 #include <cryptopp/secblock.h>
 #include "crypto_helpers.h"
-
-#include <iomanip>
 #include <iostream>
 
 using namespace CryptoPP;
@@ -51,17 +48,17 @@ string BytesToHex(const SecByteBlock& byteString) {
     return output;
 }
 
-SecByteBlock whirlpoolHMAC(const SecByteBlock& key, const SecByteBlock& input) {
-    SecByteBlock output(Whirlpool::DIGESTSIZE);
+SecByteBlock BLAKE3_MAC(const SecByteBlock& key, const SecByteBlock& input) {
+    SecByteBlock output(BLAKE3::DIGESTSIZE);
 
-    HMAC<Whirlpool> hmac(key, key.size());
+    BLAKE3 mac(key, key.size());
 
     ArraySource(
         input,
         input.size(),
         true,
         new HashFilter(
-            hmac,
+            mac,
             new ArraySink(output.data(), output.size())
         )
     );
@@ -69,9 +66,9 @@ SecByteBlock whirlpoolHMAC(const SecByteBlock& key, const SecByteBlock& input) {
     return output;
 }
 
-SecByteBlock shakeHash(const SecByteBlock& input) {
-    SecByteBlock output(SHAKE128::DIGESTSIZE);
-    SHAKE128 hash;
+SecByteBlock WhirlpoolHash(const SecByteBlock& input) {
+    SecByteBlock output(Whirlpool::DIGESTSIZE);
+    Whirlpool hash;
 
     ArraySource(
         input,
@@ -115,10 +112,10 @@ SecByteBlock KeyStreamGenerator(const string& key, const size_t& length, const S
         SecByteBlock inputBytes;
         inputBytes += nonce;
         inputBytes += counterBytes;
-        // Create a hex string with the first 16 digits as the nonce, and the last 8 as the counter.
+        // Concatenate nonce with counter
 
-        SecByteBlock round1 = whirlpoolHMAC(keyBytes, inputBytes);
-        SecByteBlock round2 = shakeHash(round1);
+        SecByteBlock round1 = BLAKE3_MAC(keyBytes, inputBytes);
+        SecByteBlock round2 = WhirlpoolHash(round1);
         output += SHA3_512Hash(round2);
 
         counter++;

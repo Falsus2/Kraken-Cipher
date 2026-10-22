@@ -13,9 +13,9 @@ SecByteBlock HexToBytes(const string& input);
 
 string BytesToHex(const SecByteBlock& byteString);
 
-SecByteBlock whirlpoolHMAC(const SecByteBlock& key, const SecByteBlock& input) ;
+SecByteBlock BLAKE3_MAC(const SecByteBlock& key, const SecByteBlock& input);
 
-SecByteBlock shakeHash(const SecByteBlock& input);
+SecByteBlock WhirlpoolHash(const SecByteBlock& input);
 
 SecByteBlock SHA3_512Hash(const SecByteBlock& input);
 

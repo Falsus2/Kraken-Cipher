@@ -1,4 +1,3 @@
-#include <iomanip>
 #include <iostream>
 #include <string>
 #include "crypto_helpers.h"
@@ -9,12 +8,12 @@ int main() {
 
     string input, private_key;
 
-    cout << "Input your private key (128 bit hex):" << endl;
+    cout << "Input your private key (256 bit hex):" << endl;
 
     getline(cin, private_key);
 
-    if (private_key.size() != 32) {
-        cout << "Your private key must be 128-bit hex." << endl;
+    if (private_key.size() != 64) {
+        cout << "Your private key must be 256-bit hex." << endl;
         return 1;
     }
 
@@ -22,7 +21,7 @@ int main() {
         cout << "Would you like to encrypt or decrypt? (E or D)" << endl;
         getline(cin, input);
 
-        char mode = toupper(input[0]);
+        const char mode = toupper(input[0]);
 
         switch (mode) {
             case 'E':

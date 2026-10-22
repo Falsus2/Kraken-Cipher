@@ -10,5 +10,5 @@ add_executable(Kraken_Cipher
         crypto_helpers.h
         main.cpp)
 
-find_package(cryptopp CONFIG REQUIRED)
+find_package(cryptopp-modern CONFIG REQUIRED)
 target_link_libraries(Kraken_Cipher PRIVATE cryptopp::cryptopp)
